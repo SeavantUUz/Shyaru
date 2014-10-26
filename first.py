@@ -36,6 +36,41 @@ def to_AST(rule_name, tokens):
             return RuleMatch(rule, matched_list), remain_tokens
     return None, None
 
+def _recurse_tree(tree, func):
+    return map(func, tree.tokens) if tree.name in rule_map else tree[1]
+
+fix_assoc_rules = ['ADD','SUB','MUL','DIV']
+def flatten_right_associativity(tree):
+    new = _recurse_tree(tree, flatten_right_associativity)
+    if tree.name in fix_assoc_rules and len(new) == 3 and new[2].name == tree.name:
+        new[-1:] = new[-1].tokens
+    return RuleMatch(tree.name, new)
+
+
+bi_op_token_map = {'ADD':lambda a,b: a+b, 'SUB':lambda a,b:a-b, 'MUL':lambda a,b:a*b, "DIV":lambda a,b:a/b}
+
+def binary_calculate(node):
+    print(node)
+    while len(node) > 1:
+        node[:3] = [bi_op_token_map[node[1](node[0],node[2])]]
+    return node[0]
+
+calc_map = {
+        'NUM':float,
+        'ADD':binary_calculate,
+        'SUB':binary_calculate,
+        'MUL':binary_calculate,
+        'DIV':binary_calculate
+        }
+
+def evaluate(tree):
+    solutions = _recurse_tree(tree, evaluate)
+    func = calc_map.get(tree.name, lambda x:x)
+    return func(solutions)
+
+print(evaluate(flatten_right_associativity(to_AST('expr', tokens)[0])))
+
+
 # simpliest
 # Node = namedtuple('Node', ('name', 'token', 'left', 'right'))
 # def to_AST(rule_name, tokens):
@@ -72,7 +107,7 @@ def print_AST(ast, indent=0):
         for token in tokens:
             print_AST(token, indent+4)
 
-print_AST(to_AST('expr', tokens))
+#print_AST(to_AST('expr', tokens))
 #print to_AST('expr', tokens)
 
     
