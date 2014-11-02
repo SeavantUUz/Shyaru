@@ -36,6 +36,52 @@ def to_AST(rule_name, tokens):
             return RuleMatch(rule, matched_list), remain_tokens
     return None, None
 
+Node = namedtuple('Node', ('name','left', 'node', 'right'))
+
+def _build_AST(rule_name, tokens):
+    if not tokens:
+        return False, None, None
+    elif rule_name not in rule_map:
+        token_name = tokens[0].name
+        if rule_name == token_name:
+            return True, Node(rule_name, None, tokens[0], None), None
+        else:
+            return False, None , None
+    rules = rule_map[rule_name] 
+    for rule in rules:
+        sub_rules = rule.split()
+        if len(sub_rules) == 1:
+            return _build_AST(sub_rules[0], tokens)
+        elif len(sub_rules) == 3 and len(tokens) >= 3:
+            left = _build_AST(sub_rules[0], [tokens[0]]) 
+            node = _build_AST(sub_rules[1], [tokens[1]])
+            right = _build_AST(sub_rules[2], tokens[2:])
+            if left[0] and node[0] and right[0]:
+                return True, Node(rule_name, left[1], node[1], right[1])
+        else:
+            continue
+    return False, None, None
+
+def build_AST(rule_name, tokens):
+    tree = _build_AST(rule_name, tokens)
+    return tree[1]
+
+#print build_AST('expr', tokens)
+
+def print_one_AST(tree, indent):
+    if not tree:
+        print ''
+    elif isinstance(tree, Token):
+        print indent * ' '+tree.value
+    else:
+        node = tree.node
+
+
+#print build_AST('expr',tokens)
+print_one_AST(build_AST('expr',tokens), 0)
+
+
+
 def _recurse_tree(tree, func):
     return map(func, tree.tokens) if tree.name in rule_map else tree[1]
 
@@ -68,7 +114,7 @@ def evaluate(tree):
     func = calc_map.get(tree.name, lambda x:x)
     return func(solutions)
 
-print(evaluate(flatten_right_associativity(to_AST('expr', tokens)[0])))
+#print(evaluate(flatten_right_associativity(to_AST('expr', tokens)[0])))
 
 
 # simpliest
