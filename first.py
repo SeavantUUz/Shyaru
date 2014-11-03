@@ -40,13 +40,13 @@ Node = namedtuple('Node', ('name','left', 'node', 'right'))
 
 def _build_AST(rule_name, tokens):
     if not tokens:
-        return False, None, None
+        return False, None
     elif rule_name not in rule_map:
         token_name = tokens[0].name
         if rule_name == token_name:
-            return True, Node(rule_name, None, tokens[0], None), None
+            return True, tokens[0]
         else:
-            return False, None , None
+            return False, None 
     rules = rule_map[rule_name] 
     for rule in rules:
         sub_rules = rule.split()
@@ -58,26 +58,31 @@ def _build_AST(rule_name, tokens):
             right = _build_AST(sub_rules[2], tokens[2:])
             if left[0] and node[0] and right[0]:
                 return True, Node(rule_name, left[1], node[1], right[1])
-        else:
-            continue
-    return False, None, None
+    return False, None
 
 def build_AST(rule_name, tokens):
     tree = _build_AST(rule_name, tokens)
     return tree[1]
 
-#print build_AST('expr', tokens)
+# print build_AST('expr', tokens)
 
 def print_one_AST(tree, indent):
     if not tree:
-        print ''
+        print 'None'
     elif isinstance(tree, Token):
         print indent * ' '+tree.value
     else:
         node = tree.node
+        left = tree.left
+        right = tree.right
+        print_one_AST(left, indent+4)
+        print (indent+1) * ' ' + '/'
+        print_one_AST(node, indent)
+        print (indent+1) * ' ' + '\\'
+        print_one_AST(right, indent+4)
 
 
-#print build_AST('expr',tokens)
+print build_AST('expr',tokens)
 print_one_AST(build_AST('expr',tokens), 0)
 
 
