@@ -40,24 +40,30 @@ Node = namedtuple('Node', ('name','left', 'node', 'right'))
 
 def _build_AST(rule_name, tokens):
     if not tokens:
-        return False, None
+        return False, None, None
     elif rule_name not in rule_map:
         token_name = tokens[0].name
         if rule_name == token_name:
-            return True, tokens[0]
+            return True, tokens[0], tokens[1:]
         else:
-            return False, None 
+            return False, tokens[0], tokens[1:]
     rules = rule_map[rule_name] 
     for rule in rules:
+        remains_tokens = tokens
+        left = []
         sub_rules = rule.split()
-        if len(sub_rules) == 1:
-            return _build_AST(sub_rules[0], tokens)
-        elif len(sub_rules) == 3 and len(tokens) >= 3:
-            left = _build_AST(sub_rules[0], [tokens[0]]) 
-            node = _build_AST(sub_rules[1], [tokens[1]])
-            right = _build_AST(sub_rules[2], tokens[2:])
-            if left[0] and node[0] and right[0]:
-                return True, Node(rule_name, left[1], node[1], right[1])
+        for sub_rule in sub_rules:
+            matched, current, remains_tokens = _build_AST(sub_rule, tokens)
+            if matched:
+                return True, Node(sub_rule, _build_AST(sub_rule)
+        #if len(sub_rules) == 1:
+        #    return _build_AST(sub_rules[0], tokens)
+        #elif len(sub_rules) == 3 and len(tokens) >= 3:
+        #    left = _build_AST(sub_rules[0], [tokens[0]]) 
+        #    node = _build_AST(sub_rules[1], [tokens[1]])
+        #    right = _build_AST(sub_rules[2], tokens[2:])
+        #    if left[0] and node[0] and right[0]:
+        #        return True, Node(rule_name, left[1], node[1], right[1])
     return False, None
 
 def build_AST(rule_name, tokens):
