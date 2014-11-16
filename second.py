@@ -45,7 +45,7 @@ def match(rule_name, tokens):
         return True, "", [], tokens, "", [], rule
         
 
-def build_AST(rule_name, tokens):
+def _build_AST(rule_name, tokens):
     # end
     if not tokens:
         return False, None
@@ -59,17 +59,50 @@ def build_AST(rule_name, tokens):
     # nonterminal symbol
     # productions
     rules = rule_map[rule_name]
-    print rules
     for rule in rules:
         matched, left_rule, left_tokens, node, right_rule, right_tokens, node_rule = match(rule, tokens)
         if matched:
             if left_tokens:
-                lret, left_node = build_AST(left_rule, left_tokens)
-                rret, right_node = build_AST(right_rule, right_tokens)
+                lret, left_node = _build_AST(left_rule, left_tokens)
+                rret, right_node = _build_AST(right_rule, right_tokens)
                 if lret and rret:
                     return True, Node(node_rule, left_node, node, right_node)
             else:
-                return build_AST(node_rule, node)
+                return _build_AST(node_rule, node)
     return False, None
 
-print build_AST('expr', tokens)
+def build_AST(rule_name, tokens):
+    tree = _build_AST(rule_name, tokens)
+    return tree[1]
+
+
+def preprocess(tokens):
+    new_tokens = []
+    tokens = iter(tokens)
+    for token in tokens:
+        if token.name == 'ADD' or token.name == 'SUB':
+            new_tokens.insert(0, token)
+            new_tokens.insert(0, next(tokens))
+        else:
+            new_tokens.append(token)
+    return new_tokens
+
+def print_AST(tree, indent=0):
+    if not tree:
+        print "None"
+    elif isinstance(tree, Token):
+        print indent * ' ' + tree.value
+    else:
+        node = tree.node
+        left = tree.left
+        right = tree.right
+        print_AST(left, indent+4)
+        print (indent + 1) * ' ' + '/'
+        print_AST(node, indent)
+        print (indent + 1) * ' ' + '\\'
+        print_AST(right, indent + 4)
+
+
+#print build_AST('expr', preprocess(tokens))
+print_AST(build_AST('expr', preprocess(tokens)), 0)
+# print preprocess(tokens)
