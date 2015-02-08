@@ -58,24 +58,26 @@ def statements():
 
 def _tokenize(text):
     f = StringIO(text)
+    scope = this['scope']
     for token_type, token_value, _, _, _ in generate_tokens(f.readline):
+        #scope = this['scope']
         if token_type == tokenize.NUMBER:
-            symbol = symbol_table('(number)')
+            symbol = scope('(number)')
             s = symbol()
             s.value = int(token_value)
             yield s
         elif token_type ==  tokenize.OP:
-            symbol = symbol_table(token_value)
+            symbol = scope(token_value)
             yield symbol()
         elif token_type == tokenize.STRING:
-            symbol = symbol_table('(string)')
+            symbol = scope('(string)')
             s = symbol()
             s.value = token_value
             yield s
         elif token_type == tokenize.NAME:
-            symbol = symbol_table(token_value, auto_commit=False)
+            symbol = scope(token_value, auto_commit=False)
             if symbol is None:
-                symbol = symbol_table('(name)')
+                symbol = scope('(name)')
                 s = symbol()
                 s.value = token_value
             else:
@@ -85,7 +87,7 @@ def _tokenize(text):
             break
         else:
             raise SyntaxError("Unknown Operator")
-    yield symbol_table('(end)')()
+    yield scope('(end)')()
 
 
 def parser(program):
@@ -174,7 +176,6 @@ class environment(object):
             else:
                 return parent._search_identify(identify)
 
-
     def fork_env(self):
         _new_env = type(self)(self)
         self.child_env = _new_env
@@ -182,15 +183,16 @@ class environment(object):
 
 
 
-
-symbol_table = environment()
+this = dict()
+this['scope'] = environment()
 
 def infix(identify, bp):
     def led(self, left):
         self.left = left
         self.right = expression(bp)
         return self
-    symbol_table(identify, bp).led = led
+    scope = this['scope']
+    scope(identify, bp).led = led
 
 
 def prefix(identify, bp):
@@ -198,7 +200,8 @@ def prefix(identify, bp):
         self.left = expression(bp)
         self.right = None
         return self
-    symbol_table(identify).nud = nud
+    scope = this['scope']
+    scope(identify).nud = nud
 
 
 def infix_r(identify, bp):
@@ -206,15 +209,16 @@ def infix_r(identify, bp):
         self.left = value
         self.right = expression(bp - 1)
         return self
-    symbol_table(identify, bp).led = led
-
+    scope = this['scope']
+    scope(identify, bp).led = led
 
 
 def init_rule():
-    symbol_table('(number)').nud = lambda self: self
-    symbol_table('(string)').nud = lambda self: self
-    symbol_table('(name)').nud = lambda self: self
-    symbol_table('(end)')
+    scope = this['scope']
+    scope('(number)').nud = lambda self: self
+    scope('(string)').nud = lambda self: self
+    scope('(name)').nud = lambda self: self
+    scope('(end)')
     infix_r('=', 20)
     infix_r('or', 30)
     infix_r('and', 40)
@@ -233,11 +237,11 @@ def init_rule():
     prefix('+', 100)
     prefix('-', 100)
     infix_r('**', 120)
-    symbol_table('.', 130)
-    symbol_table('[', 130)
-    symbol_table('(', 130)
-    symbol_table(')')
-    symbol_table(']')
+    scope('.', 130)
+    scope('[', 130)
+    scope('(', 130)
+    scope(')')
+    scope(']')
     constant('True')
     constant('False')
     constant('None')
@@ -250,7 +254,9 @@ def advance(id=None):
     token = next()
 
 
-def method(s):
+def method(identify):
+    scope = this['scope']
+    s = scope(identify)
     assert issubclass(s, Token)
     def bind(func):
         setattr(s, func.__name__, func)
@@ -258,20 +264,20 @@ def method(s):
 
 
 def constant(identify):
-    @method(symbol_table(identify))
+    @method(identify)
     def nud(self):
         self.id = '(constant)'
         self.value = identify
         return self
 
 
-@method(symbol_table('('))
+@method('(')
 def nud(self):
     expr = expression()
     advance(')')
     return expr
 
-@method(symbol_table('.'))
+@method('.')
 def led(self, left):
     if token.id != '(name)':
         raise SyntaxError("Excepted a attribute name")
@@ -280,7 +286,7 @@ def led(self, left):
     advance()
     return self
 
-@method(symbol_table('['))
+@method('[')
 def led(self, left):
     self.left = left
     self.right = expression()
@@ -288,9 +294,13 @@ def led(self, left):
     return self
 
 
-@method(symbol_table('{'))
+@method('{')
 def std(self):
-    n
+    scope = this['scope']
+    this['scope'] = scope.fork_env()
+    value = statements()
+    this['scope'] = scope
+    return value
 
 
 if __name__ == '__main__':
