@@ -17,12 +17,14 @@ import inspect
 
 
 def expression(rbp=0):
-    global token
+    global token, current_token
     t = token
+    current_token = token
     token = next()
     left = t.nud()
     while rbp < token.lbp:
         t = token
+        current_token = token
         token = next()
         left = t.led(left)
     return left
@@ -241,9 +243,10 @@ def init_rule():
 
 
 def advance(id=None):
-    global token
+    global token, current_token
     if id and token.id != id:
         raise SyntaxError("Expect %r" % id)
+    current_token = token
     token = next()
 
 
@@ -301,12 +304,42 @@ def std(self):
 @method('var')
 def std(self):
     global token
-    t = token
-    if t.id != '(name)':
-        raise SyntaxError('Except variable name')
+    n = token
+    if n.id != '(name)':
+        raise SyntaxError("Excepted a variable name")
     scope = this['scope']
-    s = scope(t.value, search=False)
+    scope(n.value, search=False)
+    advance()
+    if token.id == '=':
+        t = token
+        t.left = n
+        advance('=')
+        t.right = expression(0)
+        return t
+    else:
+        raise SyntaxError("Excepted an assignment expression")
 
+
+@method('if')
+def std(self):
+    global current_token, token
+    current = current_token
+    advance('(')
+    current.left = expression(0)
+    advance(')')
+    current.right = block()
+    return current
+
+
+@method('while')
+def std(self):
+    global current_token
+    current = current_token
+    advance('(')
+    current.left = expression(0)
+    advance(')')
+    current.right = block()
+    return current
 
 
 if __name__ == '__main__':
@@ -317,5 +350,6 @@ if __name__ == '__main__':
     print parser("(1*4)+(5*4);")
     a = parser("a = True = False or None;")
     b = parser('a=True;b=False;c;')
-    print b
+    c = parser('if (a==b) {c;}')
+    print c
 
