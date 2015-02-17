@@ -31,12 +31,10 @@ def expression(rbp=0):
 def statement():
     global token
     t = token
-    if t.std:
+    if getattr(t, 'std', None):
         advance()
         return t.std()
     v = expression(0)
-    if v.id != '=' or v.id != '(':
-        raise SyntaxError("Bad expression statement")
     advance(';')
     return v
 
@@ -54,6 +52,12 @@ def statements():
     else:
         return s_list[0] if len(s_list) == 1 else s_list
 
+
+def block():
+    global token
+    t = token
+    advance('{')
+    return t.std()
 
 
 def _tokenize(text):
@@ -90,11 +94,19 @@ def _tokenize(text):
     yield scope('(end)')()
 
 
-def parser(program):
+def _parser(program):
     global  token, next
     next = _tokenize(program).next
     token = next()
     return expression()
+
+
+def parser(program):
+    global token, next
+    next = _tokenize(program).next
+    token = next()
+    r_list = statements()
+    return r_list
 
 
 class Token(object):
@@ -118,37 +130,17 @@ class Token(object):
             return "({} {} {})".format(self.id, self.left, self.right)
 
 
-def func_environment():
-    env = dict()
-    def symbol(identify, bp=0, auto_commit = True):
-        try:
-            s = env[identify]
-        except Exception:
-            class s(Token):
-                pass
-            if auto_commit:
-                s.__name__  = 'symbol-{}'.format(identify)
-                s.id = identify
-                s.lbp = bp
-                env[identify] = s
-            else:
-                s = None
-        else:
-            s.lbp = max(s.lbp, bp)
-        return s
-    return symbol
-
-
 class environment(object):
     def __init__(self, parent=None):
         self.env = dict()
         self.parent = parent
         self.child = None
 
-    def __call__(self, identify, bp=0, auto_commit = True):
+    def __call__(self, identify, bp=0, auto_commit = True, search = True):
         s = self.env.get(identify)
         if not s:
-            s = self._search_identify(identify)
+            if search:
+                s = self._search_identify(identify)
             if not s:
                 class s(Token):
                     pass
@@ -245,6 +237,7 @@ def init_rule():
     constant('True')
     constant('False')
     constant('None')
+    constant('var')
 
 
 def advance(id=None):
@@ -277,6 +270,7 @@ def nud(self):
     advance(')')
     return expr
 
+
 @method('.')
 def led(self, left):
     if token.id != '(name)':
@@ -285,6 +279,7 @@ def led(self, left):
     self.right = token
     advance()
     return self
+
 
 @method('[')
 def led(self, left):
@@ -303,12 +298,24 @@ def std(self):
     return value
 
 
+@method('var')
+def std(self):
+    global token
+    t = token
+    if t.id != '(name)':
+        raise SyntaxError('Except variable name')
+    scope = this['scope']
+    s = scope(t.value, search=False)
+
+
+
 if __name__ == '__main__':
     init_rule()
-    print parser("'hello'+'world' + 1")
-    print parser("1*4+5*4")
-    print parser("1*(4+5)*4")
-    print parser("(1*4)+(5*4)")
-    a = parser("a = True = False or None")
-    print a.id, a.value
+    print parser("'hello'+'world' + 1;")
+    print parser("1*4+5*4;")
+    print parser("1*(4+5)*4;")
+    print parser("(1*4)+(5*4);")
+    a = parser("a = True = False or None;")
+    b = parser('a=True;b=False;c;')
+    print b
 
