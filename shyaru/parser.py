@@ -116,6 +116,7 @@ class Token(object):
     value = None
     left = None
     right = None
+    extra = None
     lbp = None
     def nud(self):
         raise SyntaxError("Syntax Error: {}".format(self.id))
@@ -129,7 +130,10 @@ class Token(object):
         if self.id == '(constant)':
             return '{}'.format(self.value)
         else:
-            return "({} {} {})".format(self.id, self.left, self.right)
+            if self.extra:
+                return "({} {} {} {})".format(self.id, self.left, self.right, self.extra)
+            else:
+                return "({} {} {})".format(self.id, self.left, self.right)
 
 
 class environment(object):
@@ -172,7 +176,7 @@ class environment(object):
 
     def fork_env(self):
         _new_env = type(self)(self)
-        self.child_env = _new_env
+        self.child = _new_env
         return _new_env
 
 
@@ -342,6 +346,46 @@ def std(self):
     return current
 
 
+@method('return')
+def std(self):
+    global current_token
+    current = current_token
+    if token.id != ';':
+        current.left = expression(0)
+    advance(';')
+    if token.id != '}':
+        raise SyntaxError('Excepted brace')
+    return current
+
+
+@method('function')
+def std(self):
+    current = current_token
+    t = token
+    if t.id != '(name)':
+        raise Exception('Error function name')
+    scope = this['scope'].fork_env()
+    args_list = []
+    advance()
+    advance('(')
+    while True:
+        if token.id == ')':
+            break
+        if token.id != '(name)':
+            raise SyntaxError('Excepted args name')
+        args_list.append(token)
+        scope(token, search=False)
+        advance()
+        if token.id == ',':
+            advance()
+    advance(')')
+    current.left = t
+    current.right = args_list
+    print token
+    current.extra = block()
+    return current
+
+
 if __name__ == '__main__':
     init_rule()
     print parser("'hello'+'world' + 1;")
@@ -352,4 +396,5 @@ if __name__ == '__main__':
     b = parser('a=True;b=False;c;')
     c = parser('if (a==b) {c;}')
     print c
+    print parser('function haha(a,b,c) { d; }')
 
