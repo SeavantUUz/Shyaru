@@ -238,10 +238,15 @@ def init_rule():
     scope('(', 130)
     scope(')')
     scope(']')
+    scope('if')
+    scope('while')
+    scope('else')
+    scope('var')
+    scope('return')
+    scope('function')
     constant('True')
     constant('False')
     constant('None')
-    constant('var')
 
 
 def advance(id=None):
@@ -328,6 +333,9 @@ def std(self):
     self.left = expression(0)
     advance(')')
     self.right = block()
+    if token.id == 'else':
+        advance('else')
+        self.extra = block()
     return self
 
 
