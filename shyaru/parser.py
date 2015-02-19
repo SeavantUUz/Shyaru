@@ -17,14 +17,12 @@ import inspect
 
 
 def expression(rbp=0):
-    global token, current_token
+    global token
     t = token
-    current_token = token
     token = next()
     left = t.nud()
     while rbp < token.lbp:
         t = token
-        current_token = token
         token = next()
         left = t.led(left)
     return left
@@ -247,10 +245,9 @@ def init_rule():
 
 
 def advance(id=None):
-    global token, current_token
+    global token
     if id and token.id != id:
         raise SyntaxError("Expect %r" % id)
-    current_token = token
     token = next()
 
 
@@ -302,6 +299,7 @@ def std(self):
     this['scope'] = scope.fork_env()
     value = statements()
     this['scope'] = scope
+    advance('}')
     return value
 
 
@@ -326,41 +324,34 @@ def std(self):
 
 @method('if')
 def std(self):
-    global current_token, token
-    current = current_token
     advance('(')
-    current.left = expression(0)
+    self.left = expression(0)
     advance(')')
-    current.right = block()
-    return current
+    self.right = block()
+    return self
 
 
 @method('while')
 def std(self):
-    global current_token
-    current = current_token
     advance('(')
-    current.left = expression(0)
+    self.left = expression(0)
     advance(')')
-    current.right = block()
-    return current
+    self.right = block()
+    return self
 
 
 @method('return')
 def std(self):
-    global current_token
-    current = current_token
     if token.id != ';':
-        current.left = expression(0)
+        self.left = expression(0)
     advance(';')
     if token.id != '}':
         raise SyntaxError('Excepted brace')
-    return current
+    return self
 
 
 @method('function')
 def std(self):
-    current = current_token
     t = token
     if t.id != '(name)':
         raise Exception('Error function name')
@@ -379,11 +370,26 @@ def std(self):
         if token.id == ',':
             advance()
     advance(')')
-    current.left = t
-    current.right = args_list
-    print token
-    current.extra = block()
-    return current
+    self.left = t
+    self.right = args_list
+    self.extra = block()
+    return self
+
+
+@method('(')
+def led(self, left):
+    self.left = left
+    args_list = []
+    while True:
+        if token.id == ')':
+            break
+        args_list.append(expression())
+        if token.id != ',':
+            break
+        advance(',')
+    advance(')')
+    self.right = args_list
+    return self
 
 
 if __name__ == '__main__':

@@ -6,7 +6,11 @@ import re
 
 _number = r'([0-9]+(\.[0-9]+)?)'
 
-_identify = r'([A-Z_a-z][A-Za-z0-9_]*)'
+_keywords = ['==', '>=', '<=', '\+', '\-', '\*', '\/', '\%', '\(', '\)', '=', '<', '>', '\{', '\}', '\:']
+
+_identify = r'([A-Z_a-z][A-Za-z0-9_]*|{})'.format('|'.join(_keywords))
+
+print _identify
 
 _string = r'([\'\"](.*)[\'\"])'
 

@@ -2,8 +2,8 @@
 __author__ = 'AprocySanae'
 __date__ = '14/12/29'
 
-from rules import pattern
-from token import IdToken, NumberToken, StringToken
+from old.rules import pattern
+from tokens import IdToken, NumberToken, StringToken, Token
 
 class Lexer(object):
     def __init__(self):
@@ -19,7 +19,8 @@ class Lexer(object):
             elif token.group(3):
                 self.tokens.append(IdToken(self.current_line, token.group(3)))
             elif token.group(5):
-                self.tokens.append(self.current_line, StringToken(token.group(5)))
+                self.tokens.append(StringToken(self.current_line, token.group(5)))
+        self.tokens.append(Token.EOL)
 
     def peek(self, n):
         if self.tokens:
