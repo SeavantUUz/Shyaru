@@ -36,7 +36,7 @@ class Lexer(object):
 
 if __name__ == '__main__':
     lexer = Lexer()
-    with open("test.as") as f:
+    with open("test.shy") as f:
         for line in f:
             lexer.readline(line)
     print lexer.tokens

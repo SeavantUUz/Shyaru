@@ -34,7 +34,10 @@ def statement():
     if getattr(t, 'std', None):
         advance()
         return t.std()
-    v = expression(0)
+    if token.id != ';':
+        v = expression(0)
+    else:
+        v = None
     advance(';')
     return v
 
@@ -63,8 +66,7 @@ def block():
 def _tokenize(text):
     f = StringIO(text)
     scope = this['scope']
-    for token_type, token_value, _, _, _ in generate_tokens(f.readline):
-        #scope = this['scope']
+    for token_type, token_value, _, _, line in generate_tokens(f.readline):
         if token_type == tokenize.NUMBER:
             symbol = scope('(number)')
             s = symbol()
@@ -89,7 +91,10 @@ def _tokenize(text):
             yield s
         elif token_type == tokenize.ENDMARKER:
             break
+        elif token_type == tokenize.NEWLINE or token_type == 54:
+           continue
         else:
+            print token_type, repr(token_value), line
             raise SyntaxError("Unknown Operator")
     yield scope('(end)')()
 
@@ -227,6 +232,8 @@ def init_rule():
     infix('<=', 60)
     infix('+', 70)
     infix('-', 70)
+    infix('+=', 70)
+    infix('-=', 70)
     infix('*', 80)
     infix('/', 80)
     infix('%', 80)
@@ -236,14 +243,11 @@ def init_rule():
     scope('.', 130)
     scope('[', 130)
     scope('(', 130)
+    scope('{')
+    scope('}')
     scope(')')
     scope(']')
-    scope('if')
-    scope('while')
-    scope('else')
-    scope('var')
-    scope('return')
-    scope('function')
+    scope(';')
     constant('True')
     constant('False')
     constant('None')
@@ -411,4 +415,5 @@ if __name__ == '__main__':
     c = parser('if (a==b) {c;}')
     print c
     print parser('function haha(a,b,c) { d; }')
+    print parser('var a = 1;')
 

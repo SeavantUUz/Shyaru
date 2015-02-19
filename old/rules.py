@@ -20,7 +20,7 @@ _rules = [_number, _identify, _string]
 pattern = re.compile('|'.join(_rules))
 
 if __name__ == "__main__":
-    with open("test.as") as f:
+    with open("test.shy") as f:
         for line in f:
             for i in pattern.finditer(line):
                 print i.group(1)
