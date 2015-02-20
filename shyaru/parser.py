@@ -319,7 +319,9 @@ def std(self):
     if n.id != '(name)':
         raise SyntaxError("Excepted a variable name")
     scope = this['scope']
-    scope(n.value, search=False)
+    symbol = scope('(name)', search=False)
+    s = symbol()
+    s.value = n.value
     advance()
     if token.id == '=':
         t = token
@@ -377,7 +379,9 @@ def std(self):
         if token.id != '(name)':
             raise SyntaxError('Excepted args name')
         args_list.append(token)
-        scope(token, search=False)
+        symbol = scope('(name)', search=False)
+        s = symbol()
+        s.value = token.value
         advance()
         if token.id == ',':
             advance()
