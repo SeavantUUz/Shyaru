@@ -127,6 +127,9 @@ class Token(object):
     def led(self, left):
         raise SyntaxError("Unknown Operator: {}".format(self.id))
 
+    def eval(self, env):
+        raise SyntaxError("Evaluate Error: {}".format(self.id))
+
     def __repr__(self):
         if self.id == '(number)' or self.id == '(string)' or self.id == '(name)':
             return '({} {})'.format(self.id[1:-1], self.value)

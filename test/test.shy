@@ -3,18 +3,14 @@ function main(a, b, c){
     var b = 2;
     var name = 3;
     name = a;
-    if (name == 1){
+    while (name == 1){
         a = 'hello world';
     }
     return name;
 }
 a = main(1,2,3);
 var i = 0;
-while (True){
-    if (a){
-        i
-    }
-    else {
-        break;
-    }
+
+if (i > 0){
+    var j = i;
 }
