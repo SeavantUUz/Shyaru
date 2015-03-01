@@ -58,6 +58,7 @@ class environment(object):
         return self.context.__str__()
 
 
+
 def int_evaluate(self, env):
     return self.value
 
@@ -81,4 +82,47 @@ def assign_evaluate(self, env):
     env[self.left.value] = right
     return right
 
+
+def add_evaluate(self, env):
+    left = evaluate(self.left, env)
+    right = evaluate(self.right, env)
+    try:
+        result = left.__add__(right)
+    except Exception:
+        raise TypeError("can't add {} and {}".format(type(left), type(right)))
+    else:
+        return result
+
+
+def sub_evaluate(self, env):
+    left = evaluate(self.left, env)
+    right = evaluate(self.right, env)
+    try:
+        result = left.__sub__(right)
+    except Exception:
+        raise TypeError("can't sub {} and {}".format(type(left), type(right)))
+    else:
+        return result
+
+
+def mul_evaluate(self, env):
+    left = evaluate(self.left, env)
+    right = evaluate(self.right, env)
+    try:
+        result = left.__mul__(right)
+    except Exception:
+        raise TypeError("can't mul {} and {}".format(type(left), type(right)))
+    else:
+        return result
+
+
+def div_evaluate(self, env):
+    left = evaluate(self.left, env)
+    right = evaluate(self.right, env)
+    try:
+        result = left.__div__(right)
+    except Exception:
+        raise TypeError("can't div {} and {}".format(type(left), type(right)))
+    else:
+        return result
 
