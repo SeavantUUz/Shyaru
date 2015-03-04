@@ -127,9 +127,6 @@ class Token(object):
     def led(self, left):
         raise SyntaxError("Unknown Operator: {}".format(self.id))
 
-    def eval(self, env):
-        raise SyntaxError("Evaluate Error: {}".format(self.id))
-
     def __repr__(self):
         if self.id == '(number)' or self.id == '(string)' or self.id == '(name)':
             return '({} {})'.format(self.id[1:-1], self.value)
@@ -322,9 +319,7 @@ def std(self):
     if n.id != '(name)':
         raise SyntaxError("Excepted a variable name")
     scope = this['scope']
-    symbol = scope('(name)', search=False)
-    s = symbol()
-    s.value = n.value
+    scope(n.value, search=False)
     advance()
     if token.id == '=':
         t = token
@@ -382,9 +377,7 @@ def std(self):
         if token.id != '(name)':
             raise SyntaxError('Excepted args name')
         args_list.append(token)
-        symbol = scope('(name)', search=False)
-        s = symbol()
-        s.value = token.value
+        scope(token, search=False)
         advance()
         if token.id == ',':
             advance()

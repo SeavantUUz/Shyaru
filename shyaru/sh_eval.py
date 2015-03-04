@@ -2,11 +2,11 @@
 __author__ = 'AprocySanae'
 __date__ = '15/2/28'
 
+from number_methods import *
 
-def evaluate(ast, env=None):
-    if env is None:
-        env = environment()
-    return ast.eval(env)
+
+handler_mapping = dict()
+methods_mapping = dict()
 
 
 class environment(object):
@@ -72,7 +72,10 @@ def string_evaluate(self, env):
 
 
 def name_evaluate(self, env):
-    return env[self.value]
+    return env.get(self.value)
+
+def number_evaluate(self, env):
+    return int(self.value)
 
 
 def assign_evaluate(self, env):
@@ -83,9 +86,9 @@ def assign_evaluate(self, env):
     return right
 
 
-def add_evaluate(self, env):
-    left = evaluate(self.left, env)
-    right = evaluate(self.right, env)
+def add_evaluate(ast, env):
+    left = sh_eval(ast.left, env)
+    right = sh_eval(ast.right, env)
     try:
         result = left.__add__(right)
     except Exception:
@@ -94,9 +97,9 @@ def add_evaluate(self, env):
         return result
 
 
-def sub_evaluate(self, env):
-    left = evaluate(self.left, env)
-    right = evaluate(self.right, env)
+def sub_evaluate(ast, env):
+    left = sh_eval(ast.left, env)
+    right = sh_eval(ast.right, env)
     try:
         result = left.__sub__(right)
     except Exception:
@@ -105,9 +108,9 @@ def sub_evaluate(self, env):
         return result
 
 
-def mul_evaluate(self, env):
-    left = evaluate(self.left, env)
-    right = evaluate(self.right, env)
+def mul_evaluate(ast, env):
+    left = ast.eval(env)
+    right = ast.eval(env)
     try:
         result = left.__mul__(right)
     except Exception:
@@ -116,13 +119,33 @@ def mul_evaluate(self, env):
         return result
 
 
-def div_evaluate(self, env):
-    left = evaluate(self.left, env)
-    right = evaluate(self.right, env)
+def div_evaluate(ast, env):
+    left = ast.eval(ast.left, env)
+    right = ast.eval(ast.right, env)
     try:
         result = left.__div__(right)
     except Exception:
         raise TypeError("can't div {} and {}".format(type(left), type(right)))
     else:
         return result
+
+handler_mapping['+'] = [('eval', add_evaluate)]
+handler_mapping['-'] = [('eval', sub_evaluate)]
+handler_mapping['*'] = [('eval', mul_evaluate)]
+handler_mapping['/'] = [('eval', div_evaluate)]
+
+handler_mapping['(number)'] = [('__add__', number_add),
+                               ('__sub__', number_sub),
+                               ('__mul__', number_mul),
+                               ('__div__', number_div),
+                               ('eval', number_evaluate)]
+
+def sh_eval(ast, env=None):
+    if env is None:
+        env = environment()
+    methods = handler_mapping[ast.id]
+    for name, method in methods:
+        setattr(ast, name, method)
+    return ast.eval(ast, env)
+
 
