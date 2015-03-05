@@ -70,7 +70,7 @@ def _tokenize(text):
         if token_type == tokenize.NUMBER:
             symbol = scope('(number)')
             s = symbol()
-            s.value = int(token_value)
+            s.value = token_value
             yield s
         elif token_type ==  tokenize.OP:
             symbol = scope(token_value)

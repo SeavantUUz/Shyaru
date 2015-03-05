@@ -5,13 +5,15 @@ __date__ = '15/3/5'
 
 
 def number_add(self, number):
-    return self + number
+    print self
+    print number
+    return self.value + number.value
 
 def number_sub(self, number):
-    return self - number
+    return self.value - number.value
 
 def number_mul(self, number):
-    return self * number
+    return self.value * number.value
 
 def number_div(self, number):
-    return self / number
+    return self.value / number.value

@@ -6,5 +6,7 @@ from parser import parser, init_rule
 from sh_eval import sh_eval
 init_rule()
 
-ast = parser('1+2;')
+ast = parser('1+2.0;')
+print ast
 print sh_eval(ast)
+print sh_eval(parser('1+2+6;'))

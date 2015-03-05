@@ -3,6 +3,7 @@ __author__ = 'AprocySanae'
 __date__ = '15/2/28'
 
 from number_methods import *
+from traceback import format_exc as einfo
 
 
 handler_mapping = dict()
@@ -58,15 +59,6 @@ class environment(object):
         return self.context.__str__()
 
 
-
-def int_evaluate(self, env):
-    return self.value
-
-
-def float_evaluate(self, env):
-    return self.value
-
-
 def string_evaluate(self, env):
     return self.value
 
@@ -74,15 +66,21 @@ def string_evaluate(self, env):
 def name_evaluate(self, env):
     return env.get(self.value)
 
+
 def number_evaluate(self, env):
-    return int(self.value)
+    if '.' in self.value:
+        self.value = float(self.value)
+        return self
+    else:
+        self.value = long(self.value)
+        return self
 
 
 def assign_evaluate(self, env):
     if self.left.id != '(name)':
         raise SyntaxError("can't assign to wrong type")
-    right = evaluate(self.right, env)
-    env[self.left.value] = right
+    right = sh_eval(self.right, env)
+    env.set(self.left.value, right)
     return right
 
 
@@ -90,8 +88,9 @@ def add_evaluate(ast, env):
     left = sh_eval(ast.left, env)
     right = sh_eval(ast.right, env)
     try:
-        result = left.__add__(right)
+        result = left.__add__(left, right)
     except Exception:
+        print einfo()
         raise TypeError("can't add {} and {}".format(type(left), type(right)))
     else:
         return result
@@ -101,7 +100,7 @@ def sub_evaluate(ast, env):
     left = sh_eval(ast.left, env)
     right = sh_eval(ast.right, env)
     try:
-        result = left.__sub__(right)
+        result = left.__sub__(left, right)
     except Exception:
         raise TypeError("can't sub {} and {}".format(type(left), type(right)))
     else:
@@ -112,7 +111,7 @@ def mul_evaluate(ast, env):
     left = ast.eval(env)
     right = ast.eval(env)
     try:
-        result = left.__mul__(right)
+        result = left.__mul__(left, right)
     except Exception:
         raise TypeError("can't mul {} and {}".format(type(left), type(right)))
     else:
@@ -123,7 +122,7 @@ def div_evaluate(ast, env):
     left = ast.eval(ast.left, env)
     right = ast.eval(ast.right, env)
     try:
-        result = left.__div__(right)
+        result = left.__div__(left, right)
     except Exception:
         raise TypeError("can't div {} and {}".format(type(left), type(right)))
     else:
@@ -133,6 +132,7 @@ handler_mapping['+'] = [('eval', add_evaluate)]
 handler_mapping['-'] = [('eval', sub_evaluate)]
 handler_mapping['*'] = [('eval', mul_evaluate)]
 handler_mapping['/'] = [('eval', div_evaluate)]
+handler_mapping['='] = [('eval', assign_evaluate)]
 
 handler_mapping['(number)'] = [('__add__', number_add),
                                ('__sub__', number_sub),
