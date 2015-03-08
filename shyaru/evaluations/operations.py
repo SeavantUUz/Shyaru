@@ -5,7 +5,6 @@ __date__ = '15/3/8'
 __all__ = ['add_evaluate', 'sub_evaluate', 'mul_evaluate', 'div_evaluate']
 
 from traceback import format_exc as einfo
-from shyaru.evaluations import *
 from shyaru.sh_eval import sh_eval
 
 
@@ -56,7 +55,10 @@ def div_evaluate(ast, env):
         return result
 
 
-methods_mapping['+'] = [('eval', add_evaluate)]
-methods_mapping['-'] = [('eval', sub_evaluate)]
-methods_mapping['*'] = [('eval', mul_evaluate)]
-methods_mapping['/'] = [('eval', div_evaluate)]
+def init_methods():
+    r = dict()
+    r['+'] = [('eval', add_evaluate)]
+    r['-'] = [('eval', sub_evaluate)]
+    r['*'] = [('eval', mul_evaluate)]
+    r['/'] = [('eval', div_evaluate)]
+    return r
