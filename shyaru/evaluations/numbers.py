@@ -17,11 +17,25 @@ def number_mul(self, number):
 def number_div(self, number):
     return self.value / number.value
 
-def number_evaluate(self, env):
+def number_evaluate(self, env, value_type):
     if '.' in self.value:
         self.value = float(self.value)
-        return self
+        return value_type(self.value)
     else:
         self.value = long(self.value)
-        return self
+        return value_type(self.value)
 
+
+def init_methods():
+    r = dict()
+    r['(number)'] = [('__add__', number_add),
+                               ('__sub__', number_sub),
+                               ('__mul__', number_mul),
+                               ('__div__', number_div)]
+    return r
+
+
+def init_eval():
+    r = dict()
+    r['(number)'] = number_evaluate
+    return r

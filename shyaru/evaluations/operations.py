@@ -5,16 +5,16 @@ __date__ = '15/3/8'
 __all__ = ['add_evaluate', 'sub_evaluate', 'mul_evaluate', 'div_evaluate']
 
 from traceback import format_exc as einfo
-from shyaru.sh_eval import sh_eval
 
 
 def add_evaluate(ast, env, value_type):
+    from shyaru.sh_eval import *
     if not getattr(ast, 'left') and not getattr(ast, 'right'):
         return ast
-    left = value_type(sh_eval(ast.left, env))
-    right = value_type(sh_eval(ast.right, env))
+    left = sh_eval(ast.left, env)
+    right = sh_eval(ast.right, env)
     try:
-        result = left.__add__(left, right)
+        result = left.__add__(right)
     except Exception:
         print einfo()
         raise TypeError("can't add {} and {}".format(type(left), type(right)))
@@ -56,9 +56,13 @@ def div_evaluate(ast, env):
 
 
 def init_methods():
+    return dict()
+
+
+def init_eval():
     r = dict()
-    r['+'] = [('eval', add_evaluate)]
-    r['-'] = [('eval', sub_evaluate)]
-    r['*'] = [('eval', mul_evaluate)]
-    r['/'] = [('eval', div_evaluate)]
+    r['+'] = add_evaluate
+    r['-'] = sub_evaluate
+    r['*'] = mul_evaluate
+    r['/'] = div_evaluate
     return r
