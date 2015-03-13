@@ -10,3 +10,4 @@ ast = parser('1+2.0;')
 print ast
 print sh_eval(ast)
 print sh_eval(parser('1+2+6;'))
+print sh_eval(parser('1-2-2*6+6*2;'))

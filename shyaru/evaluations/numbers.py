@@ -8,14 +8,17 @@ def number_add(self, other):
     result = type(self)(self.value + other.value)
     return result
 
-def number_sub(self, number):
-    return self.value - number.value
+def number_sub(self, other):
+    result = type(self)(self.value - other.value)
+    return result
 
-def number_mul(self, number):
-    return self.value * number.value
+def number_mul(self, other):
+    result = type(self)(self.value * other.value)
+    return result
 
-def number_div(self, number):
-    return self.value / number.value
+def number_div(self, other):
+    result = type(self)(self.value / other.value)
+    return result
 
 def number_evaluate(self, env, value_type):
     if '.' in self.value:
