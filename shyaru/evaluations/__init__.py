@@ -30,6 +30,8 @@ def init_methods():
     methods_mapping.update(init_methods())
     from operations import init_methods
     methods_mapping.update(init_methods())
+    from strings import init_methods
+    methods_mapping.update(init_methods())
     return methods_mapping
 
 
@@ -38,6 +40,8 @@ def init_eval():
     from numbers import init_eval
     eval_mapping.update(init_eval())
     from operations import init_eval
+    eval_mapping.update(init_eval())
+    from strings import init_eval
     eval_mapping.update(init_eval())
     return eval_mapping
 

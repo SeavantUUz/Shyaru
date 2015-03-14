@@ -13,8 +13,9 @@ __date__ = '15/1/4'
 from cStringIO import StringIO
 from tokenize import generate_tokens
 import tokenize
-import inspect
+import re
 
+pattern = re.compile(r'\'(.+)\'')
 
 def expression(rbp=0):
     global token
@@ -78,7 +79,10 @@ def _tokenize(text):
         elif token_type == tokenize.STRING:
             symbol = scope('(string)')
             s = symbol()
-            s.value = token_value
+            if token_value == '':
+                s.value = token_value
+            else:
+                s.value = pattern.match(token_value).group(1)
             yield s
         elif token_type == tokenize.NAME:
             symbol = scope(token_value, auto_commit=False)
