@@ -15,8 +15,6 @@ from tokenize import generate_tokens
 import tokenize
 import re
 
-pattern = re.compile(r'\'|\"(.+)\'|\"')
-
 def expression(rbp=0):
     global token
     t = token
@@ -79,11 +77,10 @@ def _tokenize(text):
         elif token_type == tokenize.STRING:
             symbol = scope('(string)')
             s = symbol()
-            print token_value
             if token_value == '':
                 s.value = token_value
             else:
-                s.value = pattern.match(token_value).group(1)
+                s.value = token_value[1:-1]
             yield s
         elif token_type == tokenize.NAME:
             symbol = scope(token_value, auto_commit=False)

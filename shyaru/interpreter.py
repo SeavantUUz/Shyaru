@@ -8,8 +8,8 @@ init_rule()
 
 import time
 start_time = time.time()
-print sh_eval(parser('1+2+3+4+5+6+6;'))
-print sh_eval(parser('1+3/2+4;'))
+# print sh_eval(parser('1+2+3+4+5+6+6;'))
+# print sh_eval(parser('1+3/2+4;'))
 print sh_eval(parser('"hello" + "world";'))
 print time.time() - start_time
 # print sh_eval(parser('1+2+6;'))

@@ -32,3 +32,6 @@ class String(Base):
 
     def __str__(self):
         return '%s' % self.value
+
+    def eval(self, env):
+        return type(self)(self.value)

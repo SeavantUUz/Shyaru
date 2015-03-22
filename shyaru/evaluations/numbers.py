@@ -9,11 +9,12 @@ class Number(Base):
     def __init__(self, value):
         if type(value) == str:
             if '.' in value:
-                self.value = float(value)
+                value = float(value)
             else:
-                self.value = long(value)
+                value = long(value)
         else:
-            self.value = value
+            value = value
+        super(Number, self).__init__(value)
 
     def __add__(self, other):
         return type(self)(self.value + other.value)
