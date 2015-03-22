@@ -2,57 +2,38 @@
 __author__ = 'AprocySanae'
 __date__ = '15/3/8'
 
-__all__ = ['add_evaluate', 'sub_evaluate', 'mul_evaluate', 'div_evaluate']
+__all__ = ['Add']
 
-import logging
-from traceback import format_exc as einfo
+from shyaru.evaluations import Base
 
-from shyaru.sh_eval import *
+class Add(Base):
+    def __init__(self):
+        super(Add, self).__init__()
 
-def _number_evaluate(attr):
-    def wrapper(ast, env, value_type):
-        if not getattr(ast, 'left') and not getattr(ast, 'right'):
-            return ast
-        left = sh_eval(ast.left, env)
-        right = sh_eval(ast.right, env)
-        try:
-            func = getattr(left, attr)
-            result = func(right)
-        except Exception:
-            print einfo()
-        else:
-            return result
-    return wrapper
+    def eval(self, env):
+        result = self.left.__add__(self.right)
+        return result
 
+class SUB(Base):
+    def __init__(self):
+        super(SUB, self).__init__()
 
-def add_evaluate(ast, env, value_type):
-    func = _number_evaluate('__add__')
-    return func(ast, env, value_type)
+    def eval(self, env):
+        result = self.left.__sub__(self.right)
+        return result
 
+class MUL(Base):
+    def __init__(self):
+        super(MUL, self).__init__()
 
-def sub_evaluate(ast, env, value_type):
-    func = _number_evaluate('__sub__')
-    return func(ast, env, value_type)
+    def eval(self, env):
+        result = self.left.__mul__(self.right)
+        return result
 
+class DIV(Base):
+    def __init__(self):
+        super(DIV, self).__init__()
 
-def mul_evaluate(ast, env, value_type):
-    func = _number_evaluate('__mul__')
-    return func(ast, env, value_type)
-
-
-def div_evaluate(ast, env, value_type):
-    func = _number_evaluate('__div__')
-    return func(ast, env, value_type)
-
-
-def init_methods():
-    return dict()
-
-
-def init_eval():
-    r = dict()
-    r['+'] = add_evaluate
-    r['-'] = sub_evaluate
-    r['*'] = mul_evaluate
-    r['/'] = div_evaluate
-    return r
+    def eval(self, env):
+        result = self.left.__div__(self.right)
+        return result

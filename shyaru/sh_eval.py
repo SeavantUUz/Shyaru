@@ -2,23 +2,24 @@
 __author__ = 'AprocySanae'
 __date__ = '15/2/28'
 
-from evaluations import Value
-from environment import environment
+from evaluations.factory import typeFactory
 
 
 def sh_eval(ast, env=None):
-    from mapping import *
-    if env is None:
-        env = environment()
-    class_ = class_mapping.get(ast.id)
-    if not class_:
-        class SubValue(Value):
-            pass
-        methods = methods_mapping.get(ast.id)
-        if methods:
-            for name, method in methods:
-                setattr(SubValue, name, method)
-        class_mapping[ast.id] = SubValue
-        class_= SubValue
-    setattr(ast, 'eval', eval_mapping[ast.id])
-    return ast.eval(ast, env, class_)
+    if ast is None:
+        return None
+    Node = typeFactory(ast.id)
+    if not Node:
+        raise SyntaxError('Unsupported Type: {}'.format(ast.id))
+    # 已经到了endpoint
+    if not getattr(ast, 'left', None) and not getattr(ast, 'right', None):
+        node = Node(ast.value)
+        return node
+    node = Node()
+    left = sh_eval(getattr(ast, 'left', None), env)
+    if left is not None:
+        node.set(left)
+    right = sh_eval(getattr(ast, 'right', None), env)
+    if right is not None:
+        node.set(right)
+    return node.eval(env)

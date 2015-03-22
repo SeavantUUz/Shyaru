@@ -1,44 +1,34 @@
 # coding: utf-8
-__all__ = ['number_add', 'number_div', 'number_mul', 'number_sub']
+__all__ = ['Number']
 __author__ = 'AprocySanae'
 __date__ = '15/3/5'
 
+from shyaru.evaluations import Base
 
-def number_add(self, other):
-    result = type(self)(self.value + other.value)
-    return result
+class Number(Base):
+    def __init__(self, value):
+        if type(value) == str:
+            if '.' in value:
+                self.value = float(value)
+            else:
+                self.value = long(value)
+        else:
+            self.value = value
 
-def number_sub(self, other):
-    result = type(self)(self.value - other.value)
-    return result
+    def __add__(self, other):
+        return type(self)(self.value + other.value)
 
-def number_mul(self, other):
-    result = type(self)(self.value * other.value)
-    return result
+    def __sub__(self, other):
+        return type(self)(self.value - other.value)
 
-def number_div(self, other):
-    result = type(self)(self.value / other.value)
-    return result
+    def __mul__(self, other):
+        return type(self)(self.value * other.value)
 
-def number_evaluate(self, env, value_type):
-    if '.' in self.value:
-        self.value = float(self.value)
-        return value_type(self.value)
-    else:
-        self.value = long(self.value)
-        return value_type(self.value)
+    def __div__(self, other):
+        return type(self)(self.value / other.value)
 
+    def __str__(self):
+        return '%s' % self.value
 
-def init_methods():
-    r = dict()
-    r['(number)'] = [('__add__', number_add),
-                               ('__sub__', number_sub),
-                               ('__mul__', number_mul),
-                               ('__div__', number_div)]
-    return r
-
-
-def init_eval():
-    r = dict()
-    r['(number)'] = number_evaluate
-    return r
+    def eval(self, env):
+        return type(self)(self.value)
