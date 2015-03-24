@@ -3,9 +3,11 @@ __author__ = 'AprocySanae'
 __date__ = '15/2/28'
 
 from evaluations.factory import typeFactory
-
+from environment import Environment
 
 def sh_eval(ast, env=None):
+    if env is None:
+        env = Environment()
     if ast is None:
         return None
     Node = typeFactory(ast.id)

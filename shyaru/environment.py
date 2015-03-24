@@ -3,15 +3,16 @@ __author__ = 'AprocySanae'
 __date__ = '15/3/8'
 
 
-class environment(object):
+class Environment(object):
     def __init__(self, parent=None):
         self.context = dict()
         self.parent = parent
 
     def set(self, name, value):
         self.context[name] = value
+        return value
 
-    def get(self, name, lookup=True):
+    def get(self, name, lookup=False):
         try:
             if lookup:
                 value = self.search_name(name)

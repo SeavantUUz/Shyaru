@@ -2,15 +2,12 @@
 __author__ = 'AprocySanae'
 __date__ = '15/3/15'
 
+from shyaru.evaluations import Base
 
-def name_evaluate(self, env, value_type):
-    result = env.get(self.value)
-    if result is None:
-        raise SyntaxError("name '{}' is not defined".format(self.value))
-    return result
+class Name(Base):
+    def __init__(self, value):
+        super(Name, self).__init__(value)
 
+    def eval(self, env):
+        return env.get(self.value)
 
-def init_eval():
-    r = dict()
-    r['(number)'] = name_evaluate
-    return r
