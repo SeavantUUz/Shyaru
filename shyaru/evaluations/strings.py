@@ -2,7 +2,9 @@
 __author__ = 'AprocySanae'
 __date__ = '15/3/14'
 
-from shyaru.evaluations import Base
+__all__ = ['String']
+
+from ..evaluations import Base
 
 class String(Base):
     def __init__(self, value):

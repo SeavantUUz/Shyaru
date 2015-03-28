@@ -2,6 +2,7 @@
 __author__ = 'AprocySanae'
 __date__ = '15/3/8'
 
+__all__ = ['Environment']
 
 class Environment(object):
     def __init__(self, parent=None):

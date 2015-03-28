@@ -2,8 +2,10 @@
 __author__ = 'AprocySanae'
 __date__ = '15/2/28'
 
-from evaluations.factory import typeFactory
-from environment import Environment
+__all__ = ['sh_eval']
+
+from .evaluations.factory import typeFactory
+from .environment import Environment
 
 def sh_eval(ast, env=None):
     if env is None:

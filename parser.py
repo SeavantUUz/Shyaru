@@ -13,7 +13,6 @@ __date__ = '15/1/4'
 from cStringIO import StringIO
 from tokenize import generate_tokens
 import tokenize
-import re
 
 def expression(rbp=0):
     global token

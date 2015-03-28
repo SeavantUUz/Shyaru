@@ -1,9 +1,14 @@
 # coding: utf-8
+import parser
+
 __author__ = 'AprocySanae'
 __date__ = '15/2/27'
 
-from parser import parser, init_rule
-from sh_eval import sh_eval
+from parser import init_rule, parser
+from shyaru.sh_eval import *
+
+print sh_eval
+
 init_rule()
 
 import time

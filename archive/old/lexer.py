@@ -2,8 +2,8 @@
 __author__ = 'AprocySanae'
 __date__ = '14/12/29'
 
-from old.rules import pattern
-from tokens import IdToken, NumberToken, StringToken, Token
+from archive.old.rules import pattern
+from archive.old.tokens import IdToken, NumberToken, StringToken, Token
 
 class Lexer(object):
     def __init__(self):

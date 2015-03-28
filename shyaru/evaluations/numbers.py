@@ -3,7 +3,9 @@ __all__ = ['Number']
 __author__ = 'AprocySanae'
 __date__ = '15/3/5'
 
-from shyaru.evaluations import Base
+__all__ = ['Number']
+
+from ..evaluations import Base
 
 class Number(Base):
     def __init__(self, value):
