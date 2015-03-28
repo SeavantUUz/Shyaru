@@ -5,6 +5,7 @@ __date__ = '15/3/8'
 __all__ = ['Add', 'Sub', 'Mul', 'Div', 'Assign']
 
 from ..evaluations import Base
+from .names import Name
 
 class Add(Base):
     def __init__(self):
@@ -43,8 +44,7 @@ class Assign(Base):
         super(Assign, self).__init__()
 
     def eval(self, env):
-        print type(self.left)
-        # if not isinstance(self.left, Name):
-        #     raise SyntaxError("can't assign to literal")
-        return env.set(self.left.value, self.right.eval(env))
+        if not isinstance(self.left, Name):
+            raise SyntaxError("can't assign to literal")
+        return env.set(self.left.value, self.left.store(self.right.eval(env)))
 
