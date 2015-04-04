@@ -48,3 +48,11 @@ class Assign(Base):
             raise SyntaxError("can't assign to literal")
         return env.set(self.left.value, self.left.store(self.right.eval(env)))
 
+
+class Equal(Base):
+    def __init__(self):
+        super(Equal, self).__init__()
+
+    def eval(self, env):
+        result = self.left.eval(env).__eq__(self.right.eval(env))
+        return result

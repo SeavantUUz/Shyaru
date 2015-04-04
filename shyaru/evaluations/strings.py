@@ -5,6 +5,7 @@ __date__ = '15/3/14'
 __all__ = ['String']
 
 from ..evaluations import Base
+from .boolean import Boolean
 
 class String(Base):
     def __init__(self, value):
@@ -34,6 +35,15 @@ class String(Base):
 
     def __str__(self):
         return '%s' % self.value
+
+    def __eq__(self, other):
+        if type(self) != type(other):
+            return Boolean(False)
+        else:
+            if self.value == other.value:
+                return Boolean(True)
+            else:
+                return Boolean(False)
 
     def eval(self, env):
         return type(self)(self.value)
