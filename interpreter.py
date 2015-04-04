@@ -22,6 +22,7 @@ print sh_eval(parser('1+2+6;'))
 # print sh_eval(parser('1-2-2*6+6*2;'))
 # print sh_eval(parser("'hello '  + 'world';"))
 #
+print parser('if (a==b) {c;}')
 with open('/Users/aprocysanae/Github/Shyaru/test/test1.shy') as f:
     for line in f:
         print sh_eval(parser(line))

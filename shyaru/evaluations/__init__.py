@@ -8,6 +8,7 @@ class Base(object):
     def __init__(self, value=None):
         if value is not None:
             self.value = value
+        self.instant_eval = True
         self.left = None
         self.right = None
 

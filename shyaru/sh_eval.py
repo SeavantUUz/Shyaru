@@ -33,11 +33,18 @@ def sh_eval(env=None):
                     node = node
             return node
         node = Node()
-        left = _sh_eval(getattr(ast, 'left', None), env)
-        if left is not None:
-            node.set(left)
-        right = _sh_eval(getattr(ast, 'right', None), env)
-        if right is not None:
-            node.set(right)
+        instant_eval = node.instant_eval
+        if instant_eval:
+            left = _sh_eval(getattr(ast, 'left', None), env)
+            if left is not None:
+                node.set(left)
+            right = _sh_eval(getattr(ast, 'right', None), env)
+            if right is not None:
+                node.set(right)
+        else:
+            left = getattr(ast, 'left', None)
+            right = getattr(ast, 'right', None)
+            if left is None or right is None:
+                raise Exception("condition or block loss")
         return node.eval(env)
     return _sh_eval
