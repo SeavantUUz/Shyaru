@@ -10,13 +10,19 @@ class Environment(object):
         self.parent = parent
 
     def set(self, name, value):
-        self.context[name] = value
+        try:
+            target_context = self.search_name(name)
+        except KeyError:
+            self.context[name] = value
+        else:
+            target_context[name] = value
         return value
 
-    def get(self, name, lookup=False):
+    def get(self, name, lookup=True):
         try:
             if lookup:
-                value = self.search_name(name)
+                target_context = self.search_name(name)
+                value = target_context[name]
             else:
                 value = self.context[name]
         except Exception:
@@ -28,6 +34,12 @@ class Environment(object):
         new_env = type(self)(self)
         self.child = new_env
         return new_env
+
+    def delete(self):
+        if self.parent:
+            delattr(self.parent, 'child')
+        else:
+            del(self)
 
     def get_name_from_global(self, name):
         context = self.context
@@ -48,7 +60,8 @@ class Environment(object):
             else:
                 return parent.search_name(name)
         else:
-            return self.context[name]
+            # return self.context[name]
+            return self.context
 
     def __str__(self):
         return self.context.__str__()

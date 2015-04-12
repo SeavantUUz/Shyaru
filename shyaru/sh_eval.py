@@ -8,6 +8,7 @@ from .evaluations.factory import typeFactory
 from .environment import Environment
 from .evaluations.names import Name
 from .evaluations.if_statement import If
+from .evaluations.while_statement import While
 
 
 def sh_eval_list(ast_list, env=None):
@@ -21,6 +22,7 @@ def sh_eval_list(ast_list, env=None):
         env = env.fork()
     for ast in ast_list:
         final_result = sh_eval(ast, env)
+    env.delete()
     return final_result
 
 
@@ -55,4 +57,8 @@ def sh_eval(ast, env):
             if node.bool_value(left.eval(env)):
                 if_result = sh_eval_list(right, env)
                 node.set_result(if_result)
+        elif isinstance(node, While):
+            while node.bool_value(left.eval(env)):
+                while_result = sh_eval_list(right, env)
+                node.set_result(while_result)
     return node.eval(env)

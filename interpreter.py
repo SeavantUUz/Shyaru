@@ -24,7 +24,7 @@ print sh_eval_list(parser('"hello" + " world";'))
 # print sh_eval(parser("'hello '  + 'world';"))
 #
 print sh_eval_list(parser('b=1;'))
-print sh_eval_list(parser('if (1) {a=2;b=1;a=3;}'))
+print sh_eval_list(parser('a=3;while (a) {b=1;a=a-1;} a;'))
 # with open('/Users/aprocysanae/Github/Shyaru/test/test1.shy') as f:
 #     for line in f:
 #         print sh_eval_list(parser(line))

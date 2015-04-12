@@ -1,22 +1,21 @@
 # coding: utf-8
 __author__ = 'AprocySanae'
-__date__ = '15/4/4'
+__date__ = '15/4/12'
 
 from ..evaluations import Base
 
-class If(Base):
+class While(Base):
     def __init__(self):
-        super(If, self).__init__()
+        super(While, self).__init__()
         self.instant_eval = False
-        self.result = None
 
     def set_result(self, value):
         self.result = value
 
     def eval(self, env):
-        if_node = type(self)()
-        if_node.set_result(self.result)
-        return if_node
+        while_node = type(self)()
+        while_node.set_result(self.result)
+        return while_node
 
     def bool_value(self, item):
         result = item.value
@@ -28,4 +27,3 @@ class If(Base):
     def __str__(self):
         result = getattr(self, 'result', None)
         return '{}'.format(result)
-
