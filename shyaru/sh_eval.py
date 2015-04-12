@@ -18,7 +18,6 @@ def sh_eval_list(ast_list, env=None):
     if env is None:
         env = Environment()
     else:
-        print 'fork'
         env = env.fork()
     for ast in ast_list:
         final_result = sh_eval(ast, env)
@@ -54,6 +53,5 @@ def sh_eval(ast, env):
         if isinstance(node, If):
             # only for test
             if True:
-                print right
                 t = sh_eval_list(right, env)
     return node.eval(env)
