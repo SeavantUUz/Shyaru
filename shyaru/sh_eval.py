@@ -52,6 +52,7 @@ def sh_eval(ast, env):
         right = getattr(ast, 'right', None)
         if isinstance(node, If):
             # only for test
-            if True:
-                t = sh_eval_list(right, env)
+            if node.bool_value(left.eval(env)):
+                if_result = sh_eval_list(right, env)
+                node.set_result(if_result)
     return node.eval(env)

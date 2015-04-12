@@ -9,9 +9,22 @@ class If(Base):
         super(If, self).__init__()
         self.instant_eval = False
 
+    def set_result(self, value):
+        self.result = value
+
     def eval(self, env):
-        return type(self)()
+        if_node = type(self)()
+        if_node.set_result(self.result)
+        return if_node
+
+    def bool_value(self, item):
+        result = item.value
+        if result:
+            return True
+        else:
+            return False
 
     def __str__(self):
-        return 'if'
+        result = getattr(self, 'result', None)
+        return '{}'.format(result)
 
