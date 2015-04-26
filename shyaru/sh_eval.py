@@ -11,7 +11,7 @@ from .evaluations.if_statement import If
 from .evaluations.while_statement import While
 
 
-def sh_eval_list(ast_list, env=None):
+def sh_eval_list(ast_list, env=None, args=None):
     # 只把最后的结果返回去
     if not type(ast_list) == list:
         ast_list = [ast_list]
@@ -20,6 +20,9 @@ def sh_eval_list(ast_list, env=None):
         env = Environment()
     else:
         env = env.fork()
+    if args is not None:
+        for key, value in args:
+            env.set(key, value)
     for ast in ast_list:
         final_result = sh_eval(ast, env)
     env.delete()
@@ -50,15 +53,38 @@ def sh_eval(ast, env):
         if right is not None:
             node.set(right)
     else:
-        left = sh_eval(getattr(ast, 'left', None), env)
-        right = getattr(ast, 'right', None)
         if isinstance(node, If):
             # only for test
+            left = sh_eval(getattr(ast, 'left', None), env)
+            right = getattr(ast, 'right', None)
             if node.bool_value(left.eval(env)):
                 if_result = sh_eval_list(right, env)
                 node.set_result(if_result)
         elif isinstance(node, While):
+            left = sh_eval(getattr(ast, 'left', None), env)
+            right = getattr(ast, 'right', None)
             while node.bool_value(left.eval(env)):
                 while_result = sh_eval_list(right, env)
                 node.set_result(while_result)
+        elif isinstance(node, Function):
+            func_name = getattr(ast, 'left', None)
+            args_list = getattr(ast, 'right', None)
+            extra = getattr(ast, 'extra', None)
+            node.func_name = func_name
+            node.args_list = args_list
+            node.block = extra
+            env.set(node.get_func_name(), node)
+        elif isinstance(node, LParent):
+            orig_func_name = getattr(ast, 'left', None)
+            func_name = hash_func_name(orig_func_name)
+            func = env.get(func_name, None)
+            if not func:
+                raise SyntaxError("Function {} could not be found".format(orig_func_name))
+            parameters_list = getattr(ast, 'right', [])
+            parameters = dict()
+            for name, parameter in zip(func.get_args(), parameters_list):
+                value = parameter.eval(env)
+                parameters[name] = value
+            func_result = sh_eval_list(func.get_block(), env)
+            node.set_result(func_result)
     return node.eval(env)

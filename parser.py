@@ -416,5 +416,6 @@ if __name__ == '__main__':
     c = parser('if (a==b) {c;}')
     print c
     print parser('function haha(a,b,c) { d; }')
+    print parser('haha(a,b,c);')
     print parser('var a = 1;')
 
