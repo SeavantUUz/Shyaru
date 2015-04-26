@@ -9,6 +9,8 @@ from .environment import Environment
 from .evaluations.names import Name
 from .evaluations.if_statement import If
 from .evaluations.while_statement import While
+from .evaluations.function import Function
+from .evaluations.lparent import LParent
 
 
 def sh_eval_list(ast_list, env=None, args=None):
@@ -74,10 +76,14 @@ def sh_eval(ast, env):
             node.args_list = args_list
             node.block = extra
             env.set(node.get_func_name(), node)
+            node.set_result(None)
         elif isinstance(node, LParent):
             orig_func_name = getattr(ast, 'left', None)
-            func_name = hash_func_name(orig_func_name)
-            func = env.get(func_name, None)
+            try:
+                func_name = orig_func_name.value
+                func = env.get(func_name, None)
+            except Exception:
+                func = None
             if not func:
                 raise SyntaxError("Function {} could not be found".format(orig_func_name))
             parameters_list = getattr(ast, 'right', [])
