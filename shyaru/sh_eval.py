@@ -27,6 +27,7 @@ def sh_eval_list(ast_list, env=None, args=None):
             env.set(key, value)
     for ast in ast_list:
         final_result = sh_eval(ast, env)
+        print "{}->{}".format(ast, final_result)
     env.delete()
     return final_result
 
@@ -76,6 +77,7 @@ def sh_eval(ast, env):
             node.args_list = args_list
             node.block = extra
             env.set(node.get_func_name(), node)
+            print node
             node.set_result(None)
         elif isinstance(node, LParent):
             orig_func_name = getattr(ast, 'left', None)
@@ -89,8 +91,9 @@ def sh_eval(ast, env):
             parameters_list = getattr(ast, 'right', [])
             parameters = dict()
             for name, parameter in zip(func.get_args(), parameters_list):
-                value = parameter.eval(env)
-                parameters[name] = value
+                # 对name讨论的时候再看
+                # value = parameter.eval(env)
+                parameters[name] = parameter
             func_result = sh_eval_list(func.get_block(), env)
             node.set_result(func_result)
     return node.eval(env)

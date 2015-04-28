@@ -32,6 +32,7 @@ def statement():
     if getattr(t, 'std', None):
         advance()
         return t.std()
+    print token
     if token.id != ';':
         v = expression(0)
     else:
@@ -57,6 +58,7 @@ def statements():
 def block():
     global token
     t = token
+    print t
     advance('{')
     return t.std()
 
@@ -93,9 +95,8 @@ def _tokenize(text):
         elif token_type == tokenize.ENDMARKER:
             break
         elif token_type == tokenize.NEWLINE or token_type == 54:
-           continue
+            continue
         else:
-            print token_type, repr(token_value), line
             raise SyntaxError("Unknown Operator")
     yield scope('(end)')()
 
@@ -307,6 +308,7 @@ def led(self, left):
 def std(self):
     scope = this['scope']
     this['scope'] = scope.fork_env()
+    print 'statements'
     value = statements()
     this['scope'] = scope
     advance('}')
@@ -416,6 +418,6 @@ if __name__ == '__main__':
     c = parser('if (a==b) {c;}')
     print c
     print parser('function haha(a,b,c) { d; }')
-    print parser('haha(a,b,c);')
+    print parser('haha(2,b,c);')
     print parser('var a = 1;')
 
