@@ -3,4 +3,5 @@ b=a;
 function sum(a,b){
     c=a+b;
 }
-sum(4,1);
+d = sum(4,1);
+a = d+1;

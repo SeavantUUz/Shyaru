@@ -23,8 +23,8 @@ def sh_eval_list(ast_list, env=None, args=None):
     else:
         env = env.fork()
     if args is not None:
-        for key, value in args:
-            env.set(key, value)
+        for key in args:
+            env.set(key, args[key])
     for ast in ast_list:
         final_result = sh_eval(ast, env)
         print "{}->{}".format(ast, final_result)
@@ -93,7 +93,9 @@ def sh_eval(ast, env):
             for name, parameter in zip(func.get_args(), parameters_list):
                 # 对name讨论的时候再看
                 # value = parameter.eval(env)
-                parameters[name] = parameter
-            func_result = sh_eval_list(func.get_block(), env)
+                Node_ = typeFactory(parameter.id)
+                node_ = Node_(parameter.value)
+                parameters[name] = node_
+            func_result = sh_eval_list(func.get_block(), env, parameters)
             node.set_result(func_result)
     return node.eval(env)
